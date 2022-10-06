@@ -2,7 +2,7 @@
 name = "gamble"
 version = "0.0.0"
 authors = ["https://www.steadylearner.com"]
-edition = "2018"
+edition = "2021"
 autobins = false
 build = "build.rs"
 
@@ -51,24 +51,24 @@ path = "src/lib.rs"
 chrono = { version = "0.4.11", features = ["serde"] }
 
 # CLI and stdout
-console = "0.10.0"
+console = "0.15"
 prettytable-rs = "0.8.0"
 
 # SQLite and to reuse connection etc.
 # I used $cargo tree -d to find the duplicate dependency problem.
 lazy_static = "1.4.0"
-rusqlite = { version = "0.22.0", features = ["chrono"] }
+rusqlite = { version = "0.27.0", features = ["chrono"] }
 r2d2 = "0.8.8"
-r2d2_sqlite = "0.15.0"
+r2d2_sqlite = "0.20.0"
 
 #security
-rand = "0.7.3"
-rust-argon2 = "0.8.2"
+rand = "0.8"
+rust-argon2 = "1.0"
 
 # Web app with Warp
 # https://www.steadylearner.com/blog/read/How-to-use-Rust-Warp
-tokio = { version = "0.2", features = ["macros"] }
-warp = "0.2.2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+warp = "0.3"
 
 # Serde
 serde = { version = "1.0.101", features = ["derive"] }

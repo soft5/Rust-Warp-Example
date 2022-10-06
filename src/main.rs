@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, env};
 use warp::{self, Filter};
 
 #[macro_use]
@@ -30,6 +30,11 @@ use self::{
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+
+    if env::var_os("RUST_LOG").is_none() {
+        env::set_var("RUST_LOG", "access-log=info");
+    }
+    
     pretty_env_logger::init();
 
     if let Err(e) = setup() {
