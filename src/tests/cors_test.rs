@@ -19,14 +19,14 @@ async fn main() {
     println!("{:#?}", response);
 }
 
-Response {
-    status: 200,
-    version: HTTP/1.1,
-    headers: {
-        "access-control-allow-headers": "",
-        "access-control-allow-methods": "POST",
-        "access-control-allow-origin": "*",
-    },
-    body: b"",
-}
+// Response {
+//     status: 200,
+//     version: HTTP/1.1,
+//     headers: {
+//         "access-control-allow-headers": "",
+//         "access-control-allow-methods": "POST",
+//         "access-control-allow-origin": "*",
+//     },
+//     body: b"",
+// }
 

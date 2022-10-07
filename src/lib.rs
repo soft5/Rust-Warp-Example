@@ -13,6 +13,14 @@ pub mod models;
 pub mod security;
 
 pub mod db;
+mod pb;
+pub use pb::abi::*;
+// pub mod handlers;
+mod error;
+pub use error::KvError;
+
+mod storage;
+pub use storage::*;
 pub mod utils;
 
 pub fn from_stdin() -> String {

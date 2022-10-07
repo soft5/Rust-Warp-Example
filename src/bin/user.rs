@@ -3,8 +3,8 @@ use gamble::{
     db::sqlite::SQLITEPOOL,
     from_stdin,
     models::user::{
-        new_user::{NewUser}, 
-        user::{User, UserList}
+        new_user::NewUser,
+        user::{User, UserList},
     },
 };
 

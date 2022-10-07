@@ -157,4 +157,3 @@ impl CarPublicList {
         Ok(cars)
     }
 }
-

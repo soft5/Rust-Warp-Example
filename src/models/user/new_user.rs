@@ -1,7 +1,7 @@
 use rusqlite::{Connection, Result};
 
-use serde::{Deserialize, Serialize};
 use log::debug;
+use serde::{Deserialize, Serialize};
 
 use crate::{security::argon::hash, utils::random::alphanumeric_key};
 

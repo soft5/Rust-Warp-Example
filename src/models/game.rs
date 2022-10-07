@@ -6,13 +6,11 @@ use serde::{Deserialize, Serialize};
 
 use chrono::naive::NaiveDateTime;
 
-use crate::{
-    utils::game::get_fair_odd,
-};
+use crate::utils::game::get_fair_odd;
 
 use rand::Rng;
 
-use log::{debug};
+use log::debug;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

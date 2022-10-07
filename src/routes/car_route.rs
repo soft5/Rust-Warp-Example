@@ -12,10 +12,7 @@ use warp::{
     path, Filter,
 };
 
-use super::{
-    user_api_v1_path_prefix,
-    // car_api_v1_path_prefix,
-};
+use super::user_api_v1_path_prefix;
 
 pub fn list() -> BoxedFilter<()> {
     warp::get()

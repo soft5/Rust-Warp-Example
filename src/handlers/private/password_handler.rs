@@ -1,33 +1,15 @@
-use warp::{
-    reply,
-    reject::{
-        custom,
-    },
-    Rejection,
-    Reply,
-};
+use warp::{reject::custom, reply, Rejection, Reply};
 
 use log::{debug, error};
 
 use crate::{
     db::sqlite::SQLITEPOOL,
-    models::{
-        user::{
-            user::{User},
-        },
-        private::{
-            password::UpdatePasswordRequest,
-        },
-    },
+    models::{private::password::UpdatePasswordRequest, user::user::User},
     security::argon::verify,
     session::UserSession,
 };
 
-use super::super::{
-    UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR,
-    NOT_ACCEPTABLE,
-};
+use super::super::{INTERNAL_SERVER_ERROR, NOT_ACCEPTABLE, UNAUTHORIZED};
 
 pub async fn update_password(
     update_password_request: UpdatePasswordRequest,
@@ -36,7 +18,9 @@ pub async fn update_password(
     let response = match SQLITEPOOL.get() {
         Ok(conn) => {
             if let Some(user_session) = user_session {
-                let UserSession { email, password, .. } = user_session;
+                let UserSession {
+                    email, password, ..
+                } = user_session;
 
                 let UpdatePasswordRequest {
                     old_password,
@@ -46,7 +30,10 @@ pub async fn update_password(
                 // Should use argon here.
                 let correct_password = verify(&password, &old_password.as_bytes());
                 if correct_password == false {
-                    error!("The password({}) given by the user is not correct.", &old_password);
+                    error!(
+                        "The password({}) given by the user is not correct.",
+                        &old_password
+                    );
                     Err(custom(NOT_ACCEPTABLE))
                 } else {
                     if let Err(e) = User::update_password(&conn, &email, &new_password) {
@@ -61,7 +48,7 @@ pub async fn update_password(
                 debug!("Fail to update the password without authorization. Should redirect a user to /login.");
                 Err(custom(UNAUTHORIZED))
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))

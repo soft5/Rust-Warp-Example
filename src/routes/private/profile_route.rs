@@ -1,7 +1,4 @@
-use warp::{
-    filters::BoxedFilter,
-    path, Filter,
-};
+use warp::{filters::BoxedFilter, path, Filter};
 
 use super::super::user_api_v1_path_prefix;
 

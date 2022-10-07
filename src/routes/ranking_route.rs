@@ -1,11 +1,6 @@
-use warp::{
-    filters::BoxedFilter,
-    path, Filter,
-};
+use warp::{filters::BoxedFilter, path, Filter};
 
-use super::{
-    ranking_api_v1_path_prefix,
-};
+use super::ranking_api_v1_path_prefix;
 
 pub fn game_ranking_list() -> BoxedFilter<()> {
     warp::get()

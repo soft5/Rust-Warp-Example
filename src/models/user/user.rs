@@ -1,10 +1,10 @@
-use rusqlite::{params, Connection, Result, NO_PARAMS};
 use chrono::naive::NaiveDateTime;
+use rusqlite::{params, Connection, Result, NO_PARAMS};
 
-use serde::{Deserialize, Serialize};
 use log::debug;
+use serde::{Deserialize, Serialize};
 
-use crate::{security::argon::hash};
+use crate::security::argon::hash;
 
 // Should separate cash with created_at and update_at?
 // Should separate identity_id with identified_at and session_id?
@@ -188,4 +188,3 @@ impl UserList {
         Ok(users_public)
     }
 }
-

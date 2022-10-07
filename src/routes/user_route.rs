@@ -1,8 +1,6 @@
 use crate::{
     json_body,
-    models::user::{
-        requests::{NewUserRequest, LoginRequest, UpdateCashRequest, UpdateUserRequest}
-    },
+    models::user::requests::{LoginRequest, NewUserRequest, UpdateCashRequest, UpdateUserRequest},
 };
 
 use warp::{
@@ -15,7 +13,6 @@ use super::user_api_v1_path_prefix;
 
 // https://github.com/axios/axios/issues/569
 pub fn register() -> BoxedFilter<(NewUserRequest,)> {
-
     // warp::any()
     warp::post()
         .and(user_api_v1_path_prefix())

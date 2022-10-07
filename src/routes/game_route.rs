@@ -6,10 +6,7 @@ use warp::{
 
 use crate::{json_body, models::game::NewGameRequest};
 
-use super::{
-    user_api_v1_path_prefix,
-    // game_api_v1_path_prefix,
-};
+use super::user_api_v1_path_prefix;
 
 pub fn new() -> BoxedFilter<(NewGameRequest,)> {
     warp::post()

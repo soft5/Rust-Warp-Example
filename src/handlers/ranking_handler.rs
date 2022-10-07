@@ -1,30 +1,12 @@
-use crate::{
-    models::{
-        ranking::GameRankingList,
-    },
-};
+use crate::models::ranking::GameRankingList;
 
-use warp::{
-    reply,
-    Rejection,
-    Reply,
-    reject::{
-        custom,
-    }
-};
+use warp::{reject::custom, reply, Rejection, Reply};
 
-use crate::{db::sqlite::SQLITEPOOL};
+use crate::db::sqlite::SQLITEPOOL;
 
-use log::{
-    // debug,
-    error
-};
+use log::error;
 
-use super::{
-    // UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR,
-    // NOT_ACCEPTABLE,
-};
+use super::INTERNAL_SERVER_ERROR;
 
 pub async fn game_ranking_list() -> Result<impl Reply, Rejection> {
     let response = match SQLITEPOOL.get() {
@@ -32,15 +14,13 @@ pub async fn game_ranking_list() -> Result<impl Reply, Rejection> {
             let game_ranking_list = GameRankingList::rank(&conn);
 
             match game_ranking_list {
-                Ok(data) => {
-                    Ok(reply::json(&data))
-                }
+                Ok(data) => Ok(reply::json(&data)),
                 Err(e) => {
                     error!("{:#?}", e);
                     Err(custom(INTERNAL_SERVER_ERROR))
                 }
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))

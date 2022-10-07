@@ -68,7 +68,38 @@ rust-argon2 = "1.0"
 # Web app with Warp
 # https://www.steadylearner.com/blog/read/How-to-use-Rust-Warp
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio-rustls = "0.23"
 warp = "0.3"
+
+# 处理 protobuf 的代码
+prost = "0.9" 
+
+# 高效处理网络 buffer 的库
+bytes = "1"
+
+# 我们使用 HTTP status code 所以引入这个类型库
+http = "0.2" 
+
+# 错误定义和处理
+thiserror = "1" 
+
+# sled db
+sled = "0.34" 
+
+# toml 支持
+toml = "0.5" 
+
+# yamux 多路复用支持
+yamux = "0.10.0" 
+
+# raft-rs
+# raft = "0.6.0"
+
+# 处理临时目录和临时文件
+tempfile = "3" 
+
+# 并发 HashMap
+dashmap = "4" 
 
 # Serde
 serde = { version = "1.0.101", features = ["derive"] }
@@ -93,3 +124,8 @@ futures = "0.3.4"
 # anyhow = "1.0.28"
 
 
+[dev-dependencies]
+async-prost = "0.3" # 支持把 protobuf 封装成 TCP frame
+
+[build-dependencies]
+prost-build = "0.9" # 编译 protobuf

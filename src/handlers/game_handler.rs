@@ -2,43 +2,30 @@ use crate::{
     models::{
         car::Car,
         cash,
-        game::{
-            NewGame,
-            NewGameRequest,
-            find_game_result_and_profit,
-        },
-        private::{
-            game::NewGameReply,
-        }
+        game::{find_game_result_and_profit, NewGame, NewGameRequest},
+        private::game::NewGameReply,
     },
     session::UserSession,
 };
 
 use warp::{
+    reject::custom,
+    // redirect,
+    // http::{Uri},
     reply,
     Rejection,
     Reply,
-    reject::{
-        // https://docs.rs/warp/0.1.6/warp/reject/index.html
-        custom,
-        // not_found
-    },
-    // redirect,
-    // http::{Uri},
 };
 
-use crate::{
-    db::sqlite::SQLITEPOOL,
-    // redirect_to_login
-};
+use crate::db::sqlite::SQLITEPOOL;
 
 use log::{debug, error, warn};
 
 use super::{
-    UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR,
     BAD_REQUEST,
     // NOT_ACCEPTABLE,
+    INTERNAL_SERVER_ERROR,
+    UNAUTHORIZED,
 };
 
 // Could make it compile following the request of a freelance client.
@@ -65,11 +52,9 @@ pub async fn new(
                     if let Some(stake_amount) = stake_amount {
                         debug!("Finally play the game with the cash.");
 
-                        let (win, profit) = find_game_result_and_profit(number_of_participants, &stake_amount);
-                        let new_game_reply = NewGameReply {
-                            win,
-                            profit,
-                        };
+                        let (win, profit) =
+                            find_game_result_and_profit(number_of_participants, &stake_amount);
+                        let new_game_reply = NewGameReply { win, profit };
 
                         let new_game = NewGame {
                             stake_amount,
@@ -111,17 +96,18 @@ pub async fn new(
                                         } else {
                                             debug!("Finally play the game with the car.");
 
-                                            let (win, profit) = find_game_result_and_profit(number_of_participants, &stake_amount);
-                                            let new_game_reply = NewGameReply {
-                                                win,
-                                                profit,
-                                            };
+                                            let (win, profit) = find_game_result_and_profit(
+                                                number_of_participants,
+                                                &stake_amount,
+                                            );
+                                            let new_game_reply = NewGameReply { win, profit };
 
                                             cash::update(&conn, &profit, &email).unwrap();
 
                                             let new_game = NewGame {
                                                 stake_amount: stake_amount.to_owned(),
-                                                number_of_participants: number_of_participants as i64,
+                                                number_of_participants: number_of_participants
+                                                    as i64,
                                                 win,
                                                 user_id: user_id.to_owned(),
                                             };
@@ -130,7 +116,8 @@ pub async fn new(
                                                 error!("{:#?}", e);
                                                 Err(custom(INTERNAL_SERVER_ERROR))
                                             } else {
-                                                if let Err(e) = cash::update(&conn, &profit, &email) {
+                                                if let Err(e) = cash::update(&conn, &profit, &email)
+                                                {
                                                     error!("{:#?}", e);
                                                     // Should I destroy or revert game creation here?
                                                     // Handle it correctly later.
@@ -138,7 +125,8 @@ pub async fn new(
                                                 } else {
                                                     debug!("Save the new car game record played with a car.");
                                                     if !win {
-                                                        if let Err(e) = Car::delete(&conn, &car_id) {
+                                                        if let Err(e) = Car::delete(&conn, &car_id)
+                                                        {
                                                             error!("{:#?}", e);
                                                             // Should I destroy or revert game creation and cash here?
                                                             // Handle it correctly later.
@@ -160,7 +148,7 @@ pub async fn new(
                                         // Ok(reply::html("Should send the user to buy a car?"))
                                         Err(custom(BAD_REQUEST))
                                     }
-                                },
+                                }
                                 Err(e) => {
                                     error!("{:#?}", e);
                                     Err(custom(INTERNAL_SERVER_ERROR))
@@ -171,14 +159,16 @@ pub async fn new(
                             Err(custom(BAD_REQUEST))
                         }
                     }
-                },
+                }
                 Err(e) => {
                     error!("{:#?}", e);
                     Err(custom(INTERNAL_SERVER_ERROR))
                 }
             }
         } else {
-            debug!("Fail to play the game without authorization. Should redirect a user to /login.");
+            debug!(
+                "Fail to play the game without authorization. Should redirect a user to /login."
+            );
             // Ok(redirect_to_login!()) // Should handle type not match error.
             Err(custom(UNAUTHORIZED))
         }

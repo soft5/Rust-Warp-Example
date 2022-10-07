@@ -66,7 +66,7 @@ pub fn setup() -> Result<()> {
 
             // SQLite don't have boolean type.
             conn.execute(GAME, NO_PARAMS)?;
-        },
+        }
         Err(e) => {
             eprintln!("{:#?}", e);
         }

@@ -1,35 +1,23 @@
 use warp::{
-    reply,
     reject::{
         // https://docs.rs/warp/0.1.6/warp/reject/index.html
         custom,
-        not_found
+        not_found,
     },
-    Rejection,
-    Reply,
+    reply, Rejection, Reply,
 };
 
 use log::{debug, error};
 
 use crate::{
     db::sqlite::SQLITEPOOL,
-    models::{
-        user::{
-            user::{User},
-        },
-        private::{
-            profile::Profile,
-        }
-    },
+    models::{private::profile::Profile, user::user::User},
     session::UserSession,
 };
 
-use super::super::{
-    UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR,
-};
+use super::super::{INTERNAL_SERVER_ERROR, UNAUTHORIZED};
 
-pub async fn get(user_session: Option<UserSession>,) -> Result<impl Reply, Rejection> {
+pub async fn get(user_session: Option<UserSession>) -> Result<impl Reply, Rejection> {
     let response = match SQLITEPOOL.get() {
         Ok(conn) => {
             if let Some(user_session) = user_session {
@@ -51,7 +39,7 @@ pub async fn get(user_session: Option<UserSession>,) -> Result<impl Reply, Rejec
                             Err(not_found())
                         };
                         response
-                    },
+                    }
                     Err(e) => {
                         error!("{:#?}", e);
                         Err(custom(INTERNAL_SERVER_ERROR))
@@ -63,7 +51,7 @@ pub async fn get(user_session: Option<UserSession>,) -> Result<impl Reply, Rejec
                 debug!("Failed without autorization. Should redirect a user to /login at React Frontend.");
                 Err(custom(UNAUTHORIZED))
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))

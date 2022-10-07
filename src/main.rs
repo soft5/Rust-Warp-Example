@@ -1,4 +1,4 @@
-use std::{error::Error, env};
+use std::{env, error::Error};
 use warp::{self, Filter};
 
 #[macro_use]
@@ -24,17 +24,16 @@ mod server;
 
 use self::{
     db::sqlite::setup,
-    server::{end, routes_info},
     handlers::error_handler::handle_rejection,
+    server::{end, routes_info},
 };
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-
     if env::var_os("RUST_LOG").is_none() {
         env::set_var("RUST_LOG", "access-log=info");
     }
-    
+
     pretty_env_logger::init();
 
     if let Err(e) = setup() {

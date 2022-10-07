@@ -1,9 +1,4 @@
-use crate::{
-    json_body,
-    models::private::{
-        password::UpdatePasswordRequest,
-    }
-};
+use crate::{json_body, models::private::password::UpdatePasswordRequest};
 
 use warp::{
     body::{content_length_limit, json},
@@ -28,4 +23,3 @@ pub fn update_password() -> BoxedFilter<(UpdatePasswordRequest,)> {
 // -H "Content-Type: application/json"
 // -d '{ "oldPassword": "random@email.com", "newPassword": "newpassword" }'
 // ($curl -X PATCH localhost:8000/api/user/v1/password -b cookie.txt -L -H "Content-Type: application/json" -d '{ "oldPassword": "oldpassword", "newPassword": "newpassword" }')
-

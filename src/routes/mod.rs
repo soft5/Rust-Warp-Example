@@ -2,10 +2,7 @@
 // pub mod hi_route;
 // pub mod authorized_route;
 
-use warp::{
-    filters::BoxedFilter,
-    path, Filter
-};
+use warp::{filters::BoxedFilter, path, Filter};
 
 pub mod index_route;
 pub mod user_route;

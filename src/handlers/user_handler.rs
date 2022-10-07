@@ -1,15 +1,13 @@
 use warp::http::{header, Response, StatusCode};
 use warp::{
-    reply,
+    http::Uri,
+    redirect,
     reject::{
         // https://docs.rs/warp/0.1.6/warp/reject/index.html
         custom,
         not_found,
     },
-    redirect,
-    Rejection,
-    Reply,
-    http::{Uri},
+    reply, Rejection, Reply,
 };
 
 use log::{debug, error, warn};
@@ -20,28 +18,22 @@ use crate::{
     db::sqlite::SQLITEPOOL,
     models::{
         cash,
+        private::profile::Profile,
         user::{
-            new_user::{NewUser},
-            requests::{NewUserRequest, LoginRequest, UpdateCashRequest, UpdateUserRequest},
+            new_user::NewUser,
+            requests::{LoginRequest, NewUserRequest, UpdateCashRequest, UpdateUserRequest},
             // responses::{LoginSuccessResponse},
             user::{User, UserList},
         },
-        private::{
-            profile::Profile,
-        },
     },
+    redirect_to_login,
     security::argon::verify,
     session::UserSession,
-    utils::random::alphanumeric_key,
     temporary_redirect_to_home,
-    redirect_to_login,
+    utils::random::alphanumeric_key,
 };
 
-use super::{
-    UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR,
-    NOT_ACCEPTABLE,
-};
+use super::{INTERNAL_SERVER_ERROR, NOT_ACCEPTABLE, UNAUTHORIZED};
 
 pub async fn register(new_user_request: NewUserRequest) -> Result<impl Reply, Rejection> {
     let response = match SQLITEPOOL.get() {
@@ -60,12 +52,11 @@ pub async fn register(new_user_request: NewUserRequest) -> Result<impl Reply, Re
             } else {
                 // debug!("Register success and redirect a user to /login with the frontend(React).");
                 // Ok(redirect_to_login!())
-                let response = Response::builder()
-                    .body(b"".to_vec());
+                let response = Response::builder().body(b"".to_vec());
 
                 Ok(response)
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))
@@ -75,16 +66,13 @@ pub async fn register(new_user_request: NewUserRequest) -> Result<impl Reply, Re
 }
 
 pub async fn list() -> Result<impl Reply, Rejection> {
+    println!("Rejecting --------------- because list_public");
     let response = match SQLITEPOOL.get() {
-        Ok(conn) => {
-            match UserList::list_public(&conn) {
-                Ok(public_user_list) => {
-                    Ok(reply::json(&public_user_list))
-                },
-                Err(e) => {
-                    error!("{:#?}", e);
-                    Err(custom(INTERNAL_SERVER_ERROR))
-                }
+        Ok(conn) => match UserList::list_public(&conn) {
+            Ok(public_user_list) => Ok(reply::json(&public_user_list)),
+            Err(e) => {
+                error!("{:#?}", e);
+                Err(custom(INTERNAL_SERVER_ERROR))
             }
         },
         Err(e) => {
@@ -118,22 +106,19 @@ pub async fn do_login(login_request: LoginRequest) -> Result<impl Reply, Rejecti
                     // Save it to the user database also? Use it to see how users behave etc.
                     let session_id = alphanumeric_key(48);
                     let body = session_id.into_bytes();
-                    
+
                     // let body = LoginSuccessResponse {
                     //    session_id,
                     // };
                     // let encoded: Vec<u8> = bincode::serialize(&body).unwrap();
-                    
+
                     let response = Response::builder()
-                        .status(StatusCode::OK) 
-                        .header(
-                            header::SET_COOKIE,
-                            cookie,
-                        )
+                        .status(StatusCode::OK)
+                        .header(header::SET_COOKIE, cookie)
                         .body(body.to_vec());
-                     
-                        // .body(encoded);
-                    
+
+                    // .body(encoded);
+
                     Ok(response)
                 } else {
                     debug!("The password is not correct.");
@@ -145,7 +130,7 @@ pub async fn do_login(login_request: LoginRequest) -> Result<impl Reply, Rejecti
                 // Password is none. Where to send the user?
                 Err(warp::reject::not_found())
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))
@@ -178,7 +163,7 @@ pub async fn update_cash(
                 // Ok(redirect_to_login!())
                 Ok(reply()) // Use this to make it compile. Should handle it correctly later.
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))
@@ -201,10 +186,12 @@ pub async fn delete_user(user_session: Option<UserSession>) -> Result<impl Reply
                     Ok(temporary_redirect_to_home!())
                 }
             } else {
-                debug!("Fail to delete the user without authorization. Should redirect a user to /.");
+                debug!(
+                    "Fail to delete the user without authorization. Should redirect a user to /."
+                );
                 Ok(temporary_redirect_to_home!())
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))
@@ -214,7 +201,6 @@ pub async fn delete_user(user_session: Option<UserSession>) -> Result<impl Reply
 }
 
 pub async fn logout(user_session: Option<UserSession>) -> Result<impl Reply, Rejection> {
-
     let response = match SQLITEPOOL.get() {
         Ok(conn) => {
             if let Some(user_session) = user_session {
@@ -229,7 +215,7 @@ pub async fn logout(user_session: Option<UserSession>) -> Result<impl Reply, Rej
                 debug!("Fail to logout without autorization. Should redirect a user to /.");
                 Err(custom(UNAUTHORIZED))
             }
-        },
+        }
         Err(e) => {
             error!("{:#?}", e);
             Err(custom(INTERNAL_SERVER_ERROR))

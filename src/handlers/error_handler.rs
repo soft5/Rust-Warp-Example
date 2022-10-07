@@ -6,21 +6,11 @@
 
 use std::convert::Infallible;
 
-use warp::{
-    http::StatusCode,
-    Rejection,
-    Reply,
-    reject,
-};
+use warp::{http::StatusCode, reject, Rejection, Reply};
 
 use serde_derive::Serialize;
 
-use super::{
-    UNAUTHORIZED,
-    INTERNAL_SERVER_ERROR,
-    NOT_ACCEPTABLE,
-    BAD_REQUEST
-};
+use super::{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_ACCEPTABLE, UNAUTHORIZED};
 
 /// An API error serializable to JSON.
 // 1. JSON with error message and code example.
@@ -35,44 +25,24 @@ struct ErrorMessage {
 // https://docs.rs/warp/0.2.2/warp/reject/index.html
 pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> {
     let (code, message) = if err.is_not_found() {
-        (
-            StatusCode::NOT_FOUND,
-            "NOT_FOUND"
-        ) // return template here?
+        (StatusCode::NOT_FOUND, "NOT_FOUND") // return template here?
     } else if let Some(_) = err.find::<reject::MethodNotAllowed>() {
-        (
-            StatusCode::METHOD_NOT_ALLOWED,
-            "METHOD_NOT_ALLOWED"
-        )
+        println!("Rejecting --------------- because 3");
+        (StatusCode::METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED")
     } else if let Some(_) = err.find::<UNAUTHORIZED>() {
-        (
-            StatusCode::UNAUTHORIZED,
-            "UNAUTHORIZED"
-        )
+        (StatusCode::UNAUTHORIZED, "UNAUTHORIZED")
     } else if let Some(_) = err.find::<NOT_ACCEPTABLE>() {
-        (
-            StatusCode::NOT_ACCEPTABLE,
-            "NOT_ACCEPTABLE"
-        )
+        (StatusCode::NOT_ACCEPTABLE, "NOT_ACCEPTABLE")
     } else if let Some(_) = err.find::<BAD_REQUEST>() {
-        (
-            StatusCode::BAD_REQUEST,
-            "BAD_REQUEST"
-        )
+        (StatusCode::BAD_REQUEST, "BAD_REQUEST")
     } else if let Some(_) = err.find::<INTERNAL_SERVER_ERROR>() {
         // Is this necesary here?
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "INTERNAL_SERVER_ERROR"
-        )
+        (StatusCode::INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR")
     } else {
         eprintln!("unhandled rejection: {:?}", err);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "UNHANDLED_REJECTION"
-        )
+        (StatusCode::INTERNAL_SERVER_ERROR, "UNHANDLED_REJECTION")
     };
-
+    println!("Rejecting --------------- because 4 {}", code.as_u16());
     let json = warp::reply::json(&ErrorMessage {
         code: code.as_u16(),
         message: message.into(),
@@ -106,32 +76,32 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
 //     }
 // }
 
-    // let code;
-    // let message;
+// let code;
+// let message;
 
-    // if err.is_not_found() {
-    //     code = StatusCode::NOT_FOUND;
-    //     message = "NOT_FOUND"; // Put template here?
-    // } else if let Some(_) = err.find::<reject::MethodNotAllowed>() {
-    //     // We can handle a specific error, here METHOD_NOT_ALLOWED,
-    //     // and render it however we want
-    //     code = StatusCode::METHOD_NOT_ALLOWED;
-    //     message = "METHOD_NOT_ALLOWED"; // How to make this error?s
-    // } else if let Some(_) = err.find::<UNAUTHORIZED>() {
-    //     code = StatusCode::UNAUTHORIZED;
-    //     message = "UNAUTHORIZED";
-    // } else if let Some(_) = err.find::<INTERNAL_SERVER_ERROR>() {
-    //     code = StatusCode::INTERNAL_SERVER_ERROR;
-    //     message = "INTERNAL_SERVER_ERROR";
-    // } else if let Some(_) = err.find::<NOT_ACCEPTABLE>() {
-    //     code = StatusCode::NOT_ACCEPTABLE;
-    //     message = "NOT_ACCEPTABLE";
-    // } else if let Some(_) = err.find::<BAD_REQUEST>() {
-    //     code = StatusCode::BAD_REQUEST;
-    //     message = "BAD_REQUEST";
-    // } else {
-    //     // We should have expected this... Just log and say its a 500
-    //     eprintln!("unhandled rejection: {:?}", err);
-    //     code = StatusCode::INTERNAL_SERVER_ERROR;
-    //     message = "UNHANDLED_REJECTION";
-    // }
+// if err.is_not_found() {
+//     code = StatusCode::NOT_FOUND;
+//     message = "NOT_FOUND"; // Put template here?
+// } else if let Some(_) = err.find::<reject::MethodNotAllowed>() {
+//     // We can handle a specific error, here METHOD_NOT_ALLOWED,
+//     // and render it however we want
+//     code = StatusCode::METHOD_NOT_ALLOWED;
+//     message = "METHOD_NOT_ALLOWED"; // How to make this error?s
+// } else if let Some(_) = err.find::<UNAUTHORIZED>() {
+//     code = StatusCode::UNAUTHORIZED;
+//     message = "UNAUTHORIZED";
+// } else if let Some(_) = err.find::<INTERNAL_SERVER_ERROR>() {
+//     code = StatusCode::INTERNAL_SERVER_ERROR;
+//     message = "INTERNAL_SERVER_ERROR";
+// } else if let Some(_) = err.find::<NOT_ACCEPTABLE>() {
+//     code = StatusCode::NOT_ACCEPTABLE;
+//     message = "NOT_ACCEPTABLE";
+// } else if let Some(_) = err.find::<BAD_REQUEST>() {
+//     code = StatusCode::BAD_REQUEST;
+//     message = "BAD_REQUEST";
+// } else {
+//     // We should have expected this... Just log and say its a 500
+//     eprintln!("unhandled rejection: {:?}", err);
+//     code = StatusCode::INTERNAL_SERVER_ERROR;
+//     message = "UNHANDLED_REJECTION";
+// }
